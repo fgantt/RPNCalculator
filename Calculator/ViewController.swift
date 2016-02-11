@@ -113,6 +113,7 @@ class ViewController: UIViewController {
         case "sin": operationSuccess = performOperation { sin($0) }
         case "π":
             displayValue = M_PI
+            appendHistory("π")
             enter()
         default: break;
         }
