@@ -12,6 +12,7 @@
 		54B891871C585BBC00458C55 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54B891851C585BBC00458C55 /* Main.storyboard */; };
 		54B891891C585BBC00458C55 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54B891881C585BBC00458C55 /* Assets.xcassets */; };
 		54B8918C1C585BBC00458C55 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54B8918A1C585BBC00458C55 /* LaunchScreen.storyboard */; };
+		54FDB34D1C6EE8BD00708627 /* CalculatorBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FDB34C1C6EE8BD00708627 /* CalculatorBrain.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		54B891881C585BBC00458C55 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		54B8918B1C585BBC00458C55 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		54B8918D1C585BBC00458C55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		54FDB34C1C6EE8BD00708627 /* CalculatorBrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculatorBrain.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +59,7 @@
 				54B891811C585BBC00458C55 /* AppDelegate.swift */,
 				54B891831C585BBC00458C55 /* ViewController.swift */,
 				54B891851C585BBC00458C55 /* Main.storyboard */,
+				54FDB34C1C6EE8BD00708627 /* CalculatorBrain.swift */,
 				54B891881C585BBC00458C55 /* Assets.xcassets */,
 				54B8918A1C585BBC00458C55 /* LaunchScreen.storyboard */,
 				54B8918D1C585BBC00458C55 /* Info.plist */,
@@ -135,6 +138,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54FDB34D1C6EE8BD00708627 /* CalculatorBrain.swift in Sources */,
 				54B891841C585BBC00458C55 /* ViewController.swift in Sources */,
 				54B891821C585BBC00458C55 /* AppDelegate.swift in Sources */,
 			);
@@ -286,6 +290,7 @@
 				54B891921C585BBC00458C55 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

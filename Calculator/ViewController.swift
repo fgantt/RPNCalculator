@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var historyLabel: UILabel!
     
     var userIsInTheMiddleOfTypingANumber = false
-    var operandStack = Array<Double>()
+    var brain = CalculatorBrain()  // Model
     
     
     var displayValue: Double? {
@@ -22,13 +22,13 @@ class ViewController: UIViewController {
             return Double(displayLabel.text!)
         }
         set {
-            displayLabel.text! = newValue != nil ? "\(newValue!)" : "0"
+            displayLabel.text! = newValue != nil ? "\(newValue!)" : "Err"
         }
     }
     
     @IBAction func clear(sender: UIButton) {
         userIsInTheMiddleOfTypingANumber = false
-        operandStack.removeAll()
+        brain.clear()
         displayLabel.text = "0"
         historyLabel.text = ""
     }
@@ -67,9 +67,12 @@ class ViewController: UIViewController {
     
     private func enter() {
         guard displayValue != nil else { return }
-        operandStack.append(displayValue!)
         userIsInTheMiddleOfTypingANumber = false
-        print("operandStack = \(operandStack)")
+        if let result = brain.pushOperand(displayValue!) {
+            displayValue = result
+        } else {
+            displayValue = nil
+        }
     }
     
     @IBAction func changeSign(sender: UIButton) {
@@ -85,63 +88,42 @@ class ViewController: UIViewController {
                 appendHistory(operation)
             }
         } else {
-            let operationSuccess = performOperation { -$0 }
-            if operationSuccess {
+            if let result = brain.performOperation(operation) {
+                displayValue = result
                 appendHistory(operation)
                 appendHistory("=")
+            } else {
+                displayValue = nil
             }
         }
     }
     
-    @IBAction func operate(sender: UIButton) {
-        let operation = sender.currentTitle!
-        var operationSuccess = false
-        
+    @IBAction func pi(sender: UIButton) {
         if userIsInTheMiddleOfTypingANumber {
             appendHistory(displayLabel.text!)
             enter()
         }
         
-        switch (operation) {
-        case "±": operationSuccess = performOperation { -$0 }
-        case "×": operationSuccess = performOperation { $0 * $1 }
-        case "÷": operationSuccess = performOperation { $1 / $0 }
-        case "+": operationSuccess = performOperation { $0 + $1 }
-        case "−": operationSuccess = performOperation { $1 - $0 }
-        case "√": operationSuccess = performOperation { sqrt($0) }
-        case "cos": operationSuccess = performOperation { cos($0) }
-        case "sin": operationSuccess = performOperation { sin($0) }
-        case "π":
-            displayValue = M_PI
-            appendHistory("π")
+        displayValue = M_PI
+        appendHistory(sender.currentTitle!)
+        enter()
+    }
+    
+    @IBAction func operate(sender: UIButton) {
+        if userIsInTheMiddleOfTypingANumber {
+            appendHistory(displayLabel.text!)
             enter()
-        default: break;
         }
         
-        if (operationSuccess) {
-            appendHistory("\(operation)")
-        
-            if operation != "π" {
+        if let operation = sender.currentTitle {
+            if let result = brain.performOperation(operation) {
+                displayValue = result
+                appendHistory(operation)
                 appendHistory("=")
+            } else {
+                displayValue = nil
             }
         }
-        
-    }
-    
-    func performOperation(operation: (Double, Double) -> Double) -> Bool {
-        guard operandStack.count >= 2 else { return false }
-        displayValue = operation(operandStack.removeLast(), operandStack.removeLast())
-        enter()
-        return true
-    }
-    
-    // @nonobjc allows Swift overloading in Obj-C interoperable class (inherits from UIViewController).
-    @nonobjc
-    func performOperation(operation: Double -> Double) -> Bool {
-        guard operandStack.count >= 1 else { return false }
-        displayValue = operation(operandStack.removeLast())
-        enter()
-        return true
     }
     
     private func appendHistory(value: String) {
