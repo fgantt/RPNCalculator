@@ -22,7 +22,7 @@ class ViewController: UIViewController {
             return Double(displayLabel.text!)
         }
         set {
-            displayLabel.text! = newValue != nil ? "\(newValue!)" : "Err"
+            displayLabel.text! = newValue != nil ? String(format: "%g", newValue!) : " "
         }
     }
     
@@ -31,6 +31,23 @@ class ViewController: UIViewController {
         brain.clear()
         displayLabel.text = "0"
         historyLabel.text = ""
+    }
+    
+    @IBAction func setMemory(sender: UIButton) {
+        if let value = displayValue {
+            userIsInTheMiddleOfTypingANumber = false
+            brain.variableValues["M"] = value
+            if let result = brain.evaluate() {
+                displayValue = result
+            }
+            appendHistory("")
+        }
+    }
+    
+    @IBAction func pushMemory(sender: UIButton) {
+        enter()
+        brain.pushOperand("M")
+        appendHistory("")
     }
     
     @IBAction func appendDigit(sender: UIButton) {
@@ -104,9 +121,9 @@ class ViewController: UIViewController {
             enter()
         }
         
-        displayValue = M_PI
+        displayValue = brain.constants["π"]
         appendHistory(sender.currentTitle!)
-        enter()
+        brain.pushConstant(sender.currentTitle!)
     }
     
     @IBAction func operate(sender: UIButton) {
@@ -124,15 +141,15 @@ class ViewController: UIViewController {
                 displayValue = nil
             }
         }
+        
+        appendHistory("")
     }
     
     private func appendHistory(value: String) {
-        if value != "=" && historyLabel.text!.hasSuffix(" =") {
-            let toIndex = historyLabel.text!.endIndex.advancedBy(-2)
-            historyLabel.text! = historyLabel.text!.substringToIndex(toIndex)
+        let description = brain.description
+        if !description.isEmpty {
+            historyLabel.text = description + " ="
         }
-        historyLabel.text! += historyLabel.text!.characters.count > 0 ? " " : ""
-        historyLabel.text! += value
     }
     
     

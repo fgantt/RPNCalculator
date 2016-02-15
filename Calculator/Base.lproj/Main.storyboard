@@ -93,10 +93,18 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4cI-KP-HvV">
                                 <rect key="frame" x="249" y="102" width="102" height="92"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <state key="normal" title="M"/>
+                                <connections>
+                                    <action selector="pushMemory:" destination="BYZ-38-t0r" eventType="touchUpInside" id="1Bu-sH-6GQ"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Uhq-SU-YwF">
                                 <rect key="frame" x="138" y="102" width="103" height="92"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <state key="normal" title="→M"/>
+                                <connections>
+                                    <action selector="setMemory:" destination="BYZ-38-t0r" eventType="touchUpInside" id="x1H-Uv-gPz"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="azc-zs-sgn">
                                 <rect key="frame" x="359" y="301" width="103" height="92"/>
