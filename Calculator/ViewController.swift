@@ -23,6 +23,10 @@ class ViewController: UIViewController {
         }
         set {
             displayLabel.text! = newValue != nil ? String(format: "%g", newValue!) : " "
+            let description = brain.description
+            if !description.isEmpty {
+                historyLabel.text = description + " ="
+            }
         }
     }
     
@@ -40,14 +44,12 @@ class ViewController: UIViewController {
             if let result = brain.evaluate() {
                 displayValue = result
             }
-            appendHistory("")
         }
     }
     
     @IBAction func pushMemory(sender: UIButton) {
         enter()
         brain.pushOperand("M")
-        appendHistory("")
     }
     
     @IBAction func appendDigit(sender: UIButton) {
@@ -68,17 +70,18 @@ class ViewController: UIViewController {
     }
     
     @IBAction func backspace(sender: UIButton) {
-        guard userIsInTheMiddleOfTypingANumber else { return }
-        displayLabel.text! = String(displayLabel.text!.characters.dropLast(1))
-        if displayLabel.text!.characters.count == 0 || displayLabel.text! == "-" {
-            displayLabel.text = "0"
-            userIsInTheMiddleOfTypingANumber = false
+        if (userIsInTheMiddleOfTypingANumber) {
+            displayLabel.text! = String(displayLabel.text!.characters.dropLast(1))
+            if displayLabel.text!.characters.count == 0 || displayLabel.text! == "-" {
+                displayLabel.text = "0"
+                userIsInTheMiddleOfTypingANumber = false
+            }
+        } else {
+            displayValue = brain.undo()
         }
     }
     
     @IBAction func enter(sender: UIButton) {
-        appendHistory(displayLabel.text!)
-        appendHistory("↩︎")
         enter()
     }
     
@@ -102,13 +105,10 @@ class ViewController: UIViewController {
                 } else {
                     displayLabel.text! = "-\(currentValue)"
                 }
-                appendHistory(operation)
             }
         } else {
             if let result = brain.performOperation(operation) {
                 displayValue = result
-                appendHistory(operation)
-                appendHistory("=")
             } else {
                 displayValue = nil
             }
@@ -117,41 +117,26 @@ class ViewController: UIViewController {
     
     @IBAction func pi(sender: UIButton) {
         if userIsInTheMiddleOfTypingANumber {
-            appendHistory(displayLabel.text!)
             enter()
         }
         
         displayValue = brain.constants["π"]
-        appendHistory(sender.currentTitle!)
         brain.pushConstant(sender.currentTitle!)
     }
     
     @IBAction func operate(sender: UIButton) {
         if userIsInTheMiddleOfTypingANumber {
-            appendHistory(displayLabel.text!)
             enter()
         }
         
         if let operation = sender.currentTitle {
             if let result = brain.performOperation(operation) {
                 displayValue = result
-                appendHistory(operation)
-                appendHistory("=")
             } else {
                 displayValue = nil
             }
         }
-        
-        appendHistory("")
     }
-    
-    private func appendHistory(value: String) {
-        let description = brain.description
-        if !description.isEmpty {
-            historyLabel.text = description + " ="
-        }
-    }
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()

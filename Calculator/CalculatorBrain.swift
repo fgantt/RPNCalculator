@@ -143,6 +143,11 @@ class CalculatorBrain: CustomStringConvertible
         variableValues.removeAll()
     }
     
+    func undo() -> Double? {
+        opStack.removeLast()
+        return evaluate()
+    }
+    
     private func stringify(ops: [Op], currentPrecedence: Int?) -> (result: String?, remainingOps: [Op]) {
         if !ops.isEmpty {
             var remainingOps = ops
@@ -165,13 +170,16 @@ class CalculatorBrain: CustomStringConvertible
                 }
                 
             case .BinaryOperation(let symbol, _, _):
+                let wrapInParenthesis = currentPrecedence != nil && currentPrecedence! > op.precedence
                 let op1Evaluation = stringify(remainingOps, currentPrecedence: op.precedence)
                 if let operand1 = op1Evaluation.result {
                     let op2Evaluation = stringify(op1Evaluation.remainingOps, currentPrecedence: op.precedence)
                     if let operand2 = op2Evaluation.result {
-                        let wrapInParenthesis = currentPrecedence != nil && currentPrecedence! > op.precedence
                         let expression = "\(operand2) \(symbol) \(operand1)"
                         return (wrapInParenthesis ? "(\(expression))" : "\(expression)", op2Evaluation.remainingOps)
+                    } else {
+                        let expression = "? \(symbol) \(operand1)"
+                        return (wrapInParenthesis ? "(\(expression))" : "\(expression)", op1Evaluation.remainingOps)
                     }
                 }
             }
@@ -186,10 +194,12 @@ class CalculatorBrain: CustomStringConvertible
         while !remainingOps.isEmpty {
             let expressionResult = stringify(remainingOps, currentPrecedence: nil)
             remainingOps = expressionResult.remainingOps
-            if expressionResult.result == nil {
+            if let result = expressionResult.result {
+                expressionResults.append(result)
+            } else {
+                expressionResults.append("?")
                 break
             }
-            expressionResults.append(expressionResult.result!)
         }
         return expressionResults.reverse().joinWithSeparator(",")
     }
