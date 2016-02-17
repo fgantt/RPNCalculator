@@ -13,7 +13,16 @@ class CalculatorBrain: CustomStringConvertible
     enum Result: CustomStringConvertible
     {
         case Success(Double)
+        
+        // General error with message
         case Error(String)
+        
+        // Specific errors
+        case DivideByZero
+        case ConstantMissing(String)
+        case OperandMissing
+        case SquareRootOfNegativeNumber
+        case VariableMissing(String)
         
         var description: String {
             switch self {
@@ -21,6 +30,16 @@ class CalculatorBrain: CustomStringConvertible
                 return String(format: "%g", result)
             case .Error(let message):
                 return message
+            case .DivideByZero:
+                return "Divide by zero"
+            case .ConstantMissing(let symbol):
+                return "Constant \(symbol) not defined"
+            case .OperandMissing:
+                return "Not enough operands"
+            case SquareRootOfNegativeNumber:
+                return "Square root of a negative number"
+            case .VariableMissing(let symbol):
+                return "Variable \(symbol) not defined"
             }
         }
     }
@@ -30,8 +49,10 @@ class CalculatorBrain: CustomStringConvertible
         case Constant(String)
         case Variable(String)
         case Operand(Double)
-        case UnaryOperation(String, Double -> Double, (Double -> String?)?)
-        case BinaryOperation(String, Int, (Double, Double) -> Double, ((Double, Double) -> String?)?)
+        case UnaryOperation(String, Double -> Double,
+            (Double -> Result?)?)
+        case BinaryOperation(String, Int, (Double, Double) -> Double,
+            ((Double, Double) -> Result?)?)
 
         var precedence: Int {
             switch self {
@@ -72,12 +93,12 @@ class CalculatorBrain: CustomStringConvertible
         
         learnOp(Op.BinaryOperation("×", 100, *, nil))
         learnOp(Op.BinaryOperation("÷", 100, { $1 / $0 },
-            { divisor, _ in return divisor == 0.0 ? "Divide by zero" : nil }))
+            { divisor, _ in return divisor == 0.0 ? .DivideByZero : nil }))
         
         learnOp(Op.BinaryOperation("+", 50, +, nil))
         learnOp(Op.BinaryOperation("−", 50, { $1 - $0 }, nil))
         learnOp(Op.UnaryOperation("√", sqrt,
-            { $0 < 0 ? "Square root of a negative number" : nil }))
+            { $0 < 0 ? .SquareRootOfNegativeNumber : nil }))
         
         learnOp(Op.UnaryOperation("cos", cos, nil))
         learnOp(Op.UnaryOperation("sin", sin, nil))
@@ -96,13 +117,11 @@ class CalculatorBrain: CustomStringConvertible
                 if let constantValue = constants[symbol] {
                     return (constantValue, remainingOps)
                 }
-//                return (nil, remainingOps)
                 
             case .Variable(let symbol):
                 if let variableValue = variableValues[symbol] {
                     return (variableValue, remainingOps)
                 }
-//                return (nil, remainingOps)
                 
             case .Operand(let operand):
                 return (operand, remainingOps)
@@ -145,13 +164,13 @@ class CalculatorBrain: CustomStringConvertible
                 if let constantValue = constants[symbol] {
                     return (.Success(constantValue), remainingOps)
                 }
-                return (.Error("Constant \(symbol) not defined"), remainingOps)
+                return (.ConstantMissing(symbol), remainingOps)
                 
             case .Variable(let symbol):
                 if let variableValue = variableValues[symbol] {
                     return (.Success(variableValue), remainingOps)
                 }
-                return (.Error("Variable \(symbol) not defined"), remainingOps)
+                return (.VariableMissing(symbol), remainingOps)
                 
             case .Operand(let operand):
                 return (.Success(operand), remainingOps)
@@ -159,8 +178,8 @@ class CalculatorBrain: CustomStringConvertible
             case .UnaryOperation(_, let operation, let verifier):
                 let operandEvaluation = evaluate(remainingOps)
                 if let operand = operandEvaluation.result {
-                    if let failureDescription = verifier?(operand) {
-                        return (.Error(failureDescription), operandEvaluation.remainingOps)
+                    if let failureResult = verifier?(operand) {
+                        return (failureResult, operandEvaluation.remainingOps)
                     }
                     return (.Success(operation(operand)), operandEvaluation.remainingOps)
                 }
@@ -170,8 +189,8 @@ class CalculatorBrain: CustomStringConvertible
                 if let operand1 = op1Evaluation.result {
                     let op2Evaluation = evaluate(op1Evaluation.remainingOps)
                     if let operand2 = op2Evaluation.result {
-                        if let failureDescription = verifier?(operand1, operand2) {
-                            return (.Error(failureDescription), op2Evaluation.remainingOps)
+                        if let failureResult = verifier?(operand1, operand2) {
+                            return (failureResult, op2Evaluation.remainingOps)
                         }
                         return (.Success(operation(operand1, operand2)), op2Evaluation.remainingOps)
                     }
@@ -179,7 +198,7 @@ class CalculatorBrain: CustomStringConvertible
             }
         }
         
-        return (.Error("Not enough operands"), ops)
+        return (.OperandMissing, ops)
     }
     
     func evaluateAndReportErrors() -> Result {
