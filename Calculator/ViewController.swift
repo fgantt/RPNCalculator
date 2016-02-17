@@ -16,6 +16,15 @@ class ViewController: UIViewController {
     var userIsInTheMiddleOfTypingANumber = false
     var brain = CalculatorBrain()  // Model
     
+    var displayResult: CalculatorBrain.Result = .Success(0.0) {
+        didSet {
+            displayLabel.text = displayResult.description
+            let description = brain.description
+            if !description.isEmpty {
+                historyLabel.text = description + " ="
+            }
+        }
+    }
     
     var displayValue: Double? {
         get {
@@ -41,15 +50,17 @@ class ViewController: UIViewController {
         if let value = displayValue {
             userIsInTheMiddleOfTypingANumber = false
             brain.variableValues["M"] = value
-            if let result = brain.evaluate() {
-                displayValue = result
-            }
+            displayResult = brain.evaluateAndReportErrors()
+//            if let result = brain.evaluate() {
+//                displayValue = result
+//            }
         }
     }
     
     @IBAction func pushMemory(sender: UIButton) {
         enter()
         brain.pushOperand("M")
+        displayResult = brain.evaluateAndReportErrors()
     }
     
     @IBAction func appendDigit(sender: UIButton) {
@@ -73,7 +84,9 @@ class ViewController: UIViewController {
                 userIsInTheMiddleOfTypingANumber = false
             }
         } else {
-            displayValue = brain.undo()
+            //displayValue = 
+            brain.undo()
+            displayResult = brain.evaluateAndReportErrors()
         }
     }
     
@@ -84,7 +97,9 @@ class ViewController: UIViewController {
     private func enter() {
         guard displayValue != nil else { return }
         userIsInTheMiddleOfTypingANumber = false
-        displayValue = brain.pushOperand(displayValue!)
+        //displayValue = 
+        brain.pushOperand(displayValue!)
+        displayResult = brain.evaluateAndReportErrors()
     }
     
     @IBAction func changeSign(sender: UIButton) {
@@ -99,7 +114,9 @@ class ViewController: UIViewController {
                 }
             }
         } else {
-            displayValue = brain.performOperation(operation)
+            //displayValue = 
+            brain.performOperation(operation)
+            displayResult = brain.evaluateAndReportErrors()
         }
     }
     
@@ -118,7 +135,9 @@ class ViewController: UIViewController {
         }
         
         if let operation = sender.currentTitle {
-            displayValue = brain.performOperation(operation)
+            //displayValue = 
+            brain.performOperation(operation)
+            displayResult = brain.evaluateAndReportErrors()
         }
     }
     
