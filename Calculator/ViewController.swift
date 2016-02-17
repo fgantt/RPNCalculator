@@ -60,11 +60,7 @@ class ViewController: UIViewController {
         if userIsInTheMiddleOfTypingANumber {
             displayLabel.text = displayLabel.text! + digit
         } else {
-            if digit == "." {
-                displayLabel.text = "0\(digit)"
-            } else {
-                displayLabel.text = "\(digit)"
-            }
+            displayLabel.text = digit == "." ? "0\(digit)" : "\(digit)"
             userIsInTheMiddleOfTypingANumber = true
         }
     }
@@ -88,11 +84,7 @@ class ViewController: UIViewController {
     private func enter() {
         guard displayValue != nil else { return }
         userIsInTheMiddleOfTypingANumber = false
-        if let result = brain.pushOperand(displayValue!) {
-            displayValue = result
-        } else {
-            displayValue = nil
-        }
+        displayValue = brain.pushOperand(displayValue!)
     }
     
     @IBAction func changeSign(sender: UIButton) {
@@ -107,11 +99,7 @@ class ViewController: UIViewController {
                 }
             }
         } else {
-            if let result = brain.performOperation(operation) {
-                displayValue = result
-            } else {
-                displayValue = nil
-            }
+            displayValue = brain.performOperation(operation)
         }
     }
     
@@ -130,11 +118,7 @@ class ViewController: UIViewController {
         }
         
         if let operation = sender.currentTitle {
-            if let result = brain.performOperation(operation) {
-                displayValue = result
-            } else {
-                displayValue = nil
-            }
+            displayValue = brain.performOperation(operation)
         }
     }
     
